@@ -332,15 +332,20 @@
             <option value="uno1">None</option>
             <option value="dos1">LSFmod</option>
             <option value="tres1" selected>CAS</option>
+            <option value="four">FineSharp</option>
         </select>
         </form>
         <form id="con" style="display: none;">
             <label for="LSFmod">LSFmod:</label>
             <input type="range" id="LSFmod" value="100" min="0" max="1000" step="1" class="slider2" oninput="output.modLSFmod();"> <input type="checkbox" id="LSFmod-check" name="LSFmod-check">
         </form>
+        <form id="CAS" style="display: none;">
+            <label for="contadapt">CAS:</label>
+            <input type="range" id="contadapt" value="0.5" min="0" max="1" step=".01" class="slider2" oninput="output.mod();"> <input type="checkbox" id="CAS-check" name="CAS-check" checked>
+        </form>
         <form id="fine" style="display: none;">
-            <label for="finesharp">CAS:</label>
-            <input type="range" id="finesharp" value="0.5" min="0" max="1" step=".01" class="slider2" oninput="output.mod();"> <input type="checkbox" id="fine-check" name="fine-check" checked>
+            <label for="finesharp">FineSharp:</label>
+            <input type="range" id="finesharp" value="0.22" min="0" max="5" step=".01" class="slider2" oninput="output.modFine();"> <input type="checkbox" id="finesharp-check" name="finesharp-check" checked>
         </form>
     </div>
 
@@ -352,8 +357,9 @@
         <p id="dftOutput"></p>
         <p id="bmOutput"></p>
         <p id="sawOutput"></p>
+        <p id="CASoutput"></p>
         <p id="lsfOutput"></p>
-        <p id="contraOutput"></p>
+        <p id="finesharpOutput"></p>
         <p id="cropOutput"></p>
     </div>
 
@@ -414,52 +420,78 @@
                 if (document.getElementById("probando2").value == "uno1") {
 
                     document.getElementById("con").style.display = "none";
+                    document.getElementById("CAS").style.display = "none";
                     document.getElementById("fine").style.display = "none";
 
                 } else if (document.getElementById("probando2").value == "dos1"){
 
                     document.getElementById("con").style.display = "inline";
+                    document.getElementById("CAS").style.display = "none";
                     document.getElementById("fine").style.display = "none";
                 
                 } else if (document.getElementById("probando2").value == "tres1"){
 
                     document.getElementById("con").style.display = "none";
+                    document.getElementById("CAS").style.display = "inline";
+                    document.getElementById("fine").style.display = "none";
+
+                } else if (document.getElementById("probando2").value == "four"){
+
+                    document.getElementById("con").style.display = "none";
+                    document.getElementById("CAS").style.display = "none";
                     document.getElementById("fine").style.display = "inline";
-
-                } else {
-
                 }
             },
 
             contra: function () {
-            	var contraOutput,
+            	var lsfOutput,
             		contraCheck = $("#contra-check").is(":checked"),
             		contraValue = "video = haf.ContraSharpening(denoised=video2, original=video)";
             	
 
             	if ($('#knlm-check').is(':checked') && $('#contra-check').is(':checked')) {
-            		contraOutput = contraValue;
-            		document.getElementById("contraOutput").append()
+            		lsfOutput = contraValue;
+            		document.getElementById("lsfOutput").append()
             	} else {
-            		$("#contraOutput").empty()
+            		$("#lsfOutput").empty()
             	}
 
-            	$("#contraOutput").html(contraOutput);
+            	$("#lsfOutput").html(lsfOutput);
             },
 
             mod: function () {
-            	var lsfOutput,
-            		lsf = $("#finesharp").val(),
-            		lsfCheck = $("#fine-check").is(":checked"),
+            	var CASoutput,
+            		lsf = $("#contadapt").val(),
+            		lsfCheck = $("#CAS-check").is(":checked"),
                     lsfValue = "video = core.cas.CAS(video, " + lsf + ")";
 
                 if (lsfCheck) {
-                    $("#fine").removeAttr("readonly disabled");
+                    // $("#CAS").removeAttr("readonly disabled");
+                    CASoutput = lsfValue;
+                    document.getElementById("CASoutput").append()
+                    //document.getElementById("knlmOutput").style.visibility = "visible";
+                } else {
+                    // $("#contadapt").attr({ disabled: true, readonly: true });
+                    $("#CASoutput").empty()
+                    //document.getElementById("knlmOutput").style.visibility = "hidden";
+                }
+
+                $("#CASoutput").html(CASoutput);
+            },
+
+            modLSFmod: function () {
+            	var lsfOutput,
+            		lsf = $("#LSFmod").val(),
+            		lsfCheck = $("#LSFmod-check").is(":checked"),
+                    lsfValue = "video = haf.LSFmod(video, strength=" + lsf + ")";
+
+                if (lsfCheck) {
+                    // $("#CAS").removeAttr("readonly disabled");
                     lsfOutput = lsfValue;
                     document.getElementById("lsfOutput").append()
                     //document.getElementById("knlmOutput").style.visibility = "visible";
                 } else {
-                    // $("#finesharp").attr({ disabled: true, readonly: true });
+                    // $("#LSFmod").attr({ disabled: true, readonly: true });
                     $("#lsfOutput").empty()
                     //document.getElementById("knlmOutput").style.visibility = "hidden";
                 }
@@ -467,24 +499,24 @@
                 $("#lsfOutput").html(lsfOutput);
             },
 
-            modLSFmod: function () {
-            	var contraOutput,
-            		lsf = $("#LSFmod").val(),
-            		lsfCheck = $("#LSFmod-check").is(":checked"),
-                    lsfValue = "video = haf.LSFmod(video, strength=" + lsf + ")";
+            modFine: function () {
+            	var finesharpOutput,
+            		lsf = $("#finesharp").val(),
+            		lsfCheck = $("#finesharp-check").is(":checked"),
+                    lsfValue = "video = core.resize.Bicubic(video, format=vs.YUV444P16) # convert to 16bit<br>video = fun.sharpen(video, sstr=" + lsf + ")";
 
                 if (lsfCheck) {
-                    $("#fine").removeAttr("readonly disabled");
-                    contraOutput = lsfValue;
-                    document.getElementById("contraOutput").append()
+                    // $("#CAS").removeAttr("readonly disabled");
+                    finesharpOutput = lsfValue;
+                    document.getElementById("finesharpOutput").append()
                     //document.getElementById("knlmOutput").style.visibility = "visible";
                 } else {
-                    // $("#LSFmod").attr({ disabled: true, readonly: true });
-                    $("#contraOutput").empty()
+                    // $("#finesharp").attr({ disabled: true, readonly: true });
+                    $("#finesharpOutput").empty()
                     //document.getElementById("knlmOutput").style.visibility = "hidden";
                 }
 
-                $("#contraOutput").html(contraOutput);
+                $("#finesharpOutput").html(finesharpOutput);
             },
             
 
@@ -494,7 +526,7 @@
                     knlmCheck = $("#knlm-check").is(":checked"),
                     knlmValue = "video = core.knlm.KNLMeansCL(video, 0, 6, 4, " + knlm + ", channels=&quot;YUV&quot;)",
                     knlmValue2 = "denoise = core.knlm.KNLMeansCL(video, 0, 6, 4, " + knlm + ", channels=&quot;YUV&quot;)",
-                    contraOutput,
+                    lsfOutput,
             		contraCheck = $("#contra-check").is(":checked"),
             		contraValue = "<br /> video = muvs.Soothe_mod(sharp, denoise, keep=25)";
 
@@ -503,7 +535,7 @@
                 	knlmOutput = knlmValue2;
                 	knlmOutput += contraValue;
                 	document.getElementById("knlmOutput").append();
-                	document.getElementById("contraOutput").append();
+                	document.getElementById("lsfOutput").append();
                     document.getElementById("vcoutput").style.display = "block";
                 } else if (knlmCheck) {                	
                 	$("#knlm").removeAttr("readonly disabled");
@@ -513,7 +545,7 @@
                 } else {
                 	$("#knlm").attr({ disabled: true, readonly: true });
                 	$("#knlmOutput").empty();
-                	$("#contraOutput").empty();
+                	$("#lsfOutput").empty();
                 }
 
                 $("#knlmOutput").html(knlmOutput);
@@ -525,7 +557,7 @@
                     bmCheck = $("#bm-check").is(":checked"),
                     bmValue = "video = mvs.BM3D(video, sigma=" + bm + ", radius1=1, profile1=&quot;fast&quot;, matrix=&quot;709&quot;)",
                     bmValue2 = "denoise = mvs.BM3D(video, sigma=" + bm + ", radius1=1, profile1=&quot;fast&quot;, matrix=&quot;709&quot;)",
-                    contraOutput,
+                    lsfOutput,
             		contraCheck = $("#contra-check").is(":checked"),
             		contraValue = "<br /> video = muvs.Soothe_mod(sharp, denoise, keep=25)";
 
@@ -534,7 +566,7 @@
                     bmOutput = bmValue2;
                     bmOutput += contraValue;
                     document.getElementById("bmOutput").append()
-                    document.getElementById("contraOutput").append();
+                    document.getElementById("lsfOutput").append();
                     document.getElementById("vcoutput").style.display = "block";
                     //document.getElementById("knlmOutput").style.visibility = "visible";
                 } else if (bmCheck) {
@@ -546,7 +578,7 @@
                 } else {
                 	$("#bm").attr({ disabled: true, readonly: true });
                 	$("#bmOutput").empty();
-                	$("#contraOutput").empty();
+                	$("#lsfOutput").empty();
                 }
 
                 $("#bmOutput").html(bmOutput);
@@ -558,7 +590,7 @@
                     dftCheck = $("#dft-check").is(":checked"),
                     dftValue = "video = core.vd.VagueDenoiser(video, threshold=" + dft + ")",
                     dftValue2 = "video2 = core.vd.VagueDenoiser(video, threshold=" + dft + ")",
-                    contraOutput,
+                    lsfOutput,
             		contraCheck = $("#contra-check").is(":checked"),
             		contraValue = "<br /> video = haf.ContraSharpening(denoised=video2, original=video)";;
 
@@ -567,7 +599,7 @@
                     dftOutput = dftValue2;
                     dftOutput += contraValue;
                     document.getElementById("dftOutput").append()
-                    document.getElementById("contraOutput").append();
+                    document.getElementById("lsfOutput").append();
                     //document.getElementById("dftOutput").style.visibility = "visible";
                 } else if (dftCheck) {
                 	$("#dft").removeAttr("readonly disabled");
@@ -576,7 +608,7 @@
                 } else {
                     $("#dft").attr({ disabled: true, readonly: true });
                     $("#dftOutput").empty();
-                    $("#contraOutput").empty();
+                    $("#lsfOutput").empty();
                     //document.getElementById("dftOutput").style.visibility = "hidden";
                 }
 
@@ -809,16 +841,20 @@
         	output.see();
         });
 
-        $("#fine").change(function() {
+        $("#CAS").change(function() {
             output.mod();
         });
 
-        $("#fine-check").change(function() {
+        $("#CAS-check").change(function() {
             output.mod();
         });
 
         $("#LSFmod-check").change(function() {
             output.modLSFmod();
+        });
+
+        $("#finesharp-check").change(function() {
+            output.modFine();
         });
 
         $("#contra-check").change(function() {
