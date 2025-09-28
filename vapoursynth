@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# uncomment the following line if you save this script in somewhere
-# that isn't ~/Videos/vapoursynth/
-# cd ~/Videos/vapoursynth/
+# move to script directory
+cd "$(dirname "$0")"
 
 echo "Start timestamp (e.g. 00:01:34): "
 read timestamp
