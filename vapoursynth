@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# uncomment the following line if you save this script in somewhere
+# that isn't ~/Videos/vapoursynth/
+# cd ~/Videos/vapoursynth/
+
+echo "Start timestamp (e.g. 00:01:34): "
+read timestamp
+echo "Encoding duration (e.g. 00:00:05): "
+read timestamp2
+
+ffmpeg -y -ss $timestamp -t $timestamp2 -i ../$1 -vcodec libx264 -preset ultrafast -qp 0 cut.mkv
+ffmpeg -y -ss $timestamp -t $timestamp2 -i ../$1 -vcodec libx264 -preset ultrafast -pix_fmt yuv420p cut_resizer.mp4
+thorium-browser resizer.html &
+vsedit
