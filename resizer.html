@@ -330,13 +330,13 @@
         <label for="probando2">Sharpening:</label>
         <select id="probando2" onchange="output.prob2();">
             <option value="uno1">None</option>
-            <!-- <option value="dos1">VCFreq</option> -->
+            <option value="dos1">LSFmod</option>
             <option value="tres1" selected>CAS</option>
         </select>
         </form>
         <form id="con" style="display: none;">
-            <label for="contra">VCFreq:</label>
-            <input type="checkbox" id="contra-check" name="contra-check" oninput="output.denoise();output.blind();output.test()">
+            <label for="LSFmod">LSFmod:</label>
+            <input type="range" id="LSFmod" value="100" min="0" max="1000" step="1" class="slider2" oninput="output.modLSFmod();"> <input type="checkbox" id="LSFmod-check" name="LSFmod-check">
         </form>
         <form id="fine" style="display: none;">
             <label for="finesharp">CAS:</label>
@@ -459,12 +459,32 @@
                     document.getElementById("lsfOutput").append()
                     //document.getElementById("knlmOutput").style.visibility = "visible";
                 } else {
-                    $("#finesharp").attr({ disabled: true, readonly: true });
+                    // $("#finesharp").attr({ disabled: true, readonly: true });
                     $("#lsfOutput").empty()
                     //document.getElementById("knlmOutput").style.visibility = "hidden";
                 }
 
                 $("#lsfOutput").html(lsfOutput);
+            },
+
+            modLSFmod: function () {
+            	var contraOutput,
+            		lsf = $("#LSFmod").val(),
+            		lsfCheck = $("#LSFmod-check").is(":checked"),
+                    lsfValue = "video = haf.LSFmod(video, strength=" + lsf + ")";
+
+                if (lsfCheck) {
+                    $("#fine").removeAttr("readonly disabled");
+                    contraOutput = lsfValue;
+                    document.getElementById("contraOutput").append()
+                    //document.getElementById("knlmOutput").style.visibility = "visible";
+                } else {
+                    // $("#LSFmod").attr({ disabled: true, readonly: true });
+                    $("#contraOutput").empty()
+                    //document.getElementById("knlmOutput").style.visibility = "hidden";
+                }
+
+                $("#contraOutput").html(contraOutput);
             },
             
 
@@ -566,38 +586,14 @@
             resizer: function (dimensions) {
                 var resizerOutput,
                     resizer = $("#resizer").val(),
-                    sharpenCheck = $("#sharpen-check").is(":checked"),
+                    // sharpenCheck = $("#sharpen-check").is(":checked"),
                     sharpenValue = "a1=" + $("#sharpen").val() + ",a2=0.20)";
 
                 if (!dimensions) {
                     dimensions = target.width() + "," + target.height();
                 }
 
-                if (sharpenCheck) {
-                  $("#sharpen").removeAttr("readonly disabled");
-                  switch(resizer) {
-                    case "despline":
-                      resizerOutput = "video = core.descale.Despline36(video, " + dimensions + ")";
-                      resizerOutput += sharpenValue;
-                      break;
-                    case "debilinear":
-                      resizerOutput = "video = core.descale.Debilinear(video, " + dimensions + ")";
-                      break;
-                    case "debicubic":
-                      resizerOutput = "video = core.descale.Debicubic(video, " + dimensions + ")";
-                      break;
-                    case "resamplehq":
-                      resizerOutput = "video = rhq.resample_hq(video, " + dimensions + ")";
-                      break;
-                    case "blackmanminlobe":
-                      resizerOutput = "video = core.fmtc.resample(video, " + dimensions + ", kernel=&quot;blackmanminlobe&quot;)";
-                      break;
-                    case "spline36":
-                      resizerOutput = "video = core.fmtc.resample(video, " + dimensions + ", kernel=&quot;spline36&quot;)";
-                      break;
-                  }
-                } else {
-                  $("#sharpen").attr({ disabled: true, readonly: true });
+                $("#sharpen").attr({ disabled: true, readonly: true });
                   switch(resizer) {
                     case "despline":
                       resizerOutput = "video = core.descale.Despline36(video, " + dimensions + ")";
@@ -618,7 +614,6 @@
                       resizerOutput = "video = core.fmtc.resample(video, " + dimensions + ", kernel=&quot;spline36&quot;)";
                       break;
                   }
-                }
 
                 $("#resizerOutput").html(resizerOutput);
 
@@ -820,6 +815,10 @@
 
         $("#fine-check").change(function() {
             output.mod();
+        });
+
+        $("#LSFmod-check").change(function() {
+            output.modLSFmod();
         });
 
         $("#contra-check").change(function() {
